@@ -60,7 +60,7 @@ namespace _03_BadgesUI
             }
         }
 
-        //Add New Badge
+        
         private void CreateNewItem()
         {
             Console.Clear();
@@ -68,154 +68,112 @@ namespace _03_BadgesUI
             //int claim number
             Console.Write("What is the number on the badge:  ");
             int badgeID = int.Parse(Console.ReadLine());
-
+            List<string> DoorList = new List<string>();
             //string door
             Console.Write("List a door that it needs access to:  ");
             string listOfDoorNamesForAccess = Console.ReadLine();
-
+            DoorList.Add(listOfDoorNamesForAccess);
             //ask for additional doors
-            Console.Write("Any other doors(y/n)? ");
-            char userInput;
-            bool parseResult = char.TryParse(Console.ReadLine(), out userInput);
-            while (userInput == 'Y' || userInput == 'y')
+            bool KeepRuning = true;
+            while (KeepRuning)
             {
-           //     Console.Write("List a door that it needs access to:  ");
-           // string ListOfDoorNamesForAccess = Console.ReadLine();
-           //  }
-                else
+                Console.Write("Any other doors(y/n)? ");
+                string userInput = Console.ReadLine();
+                if (userInput == "Y" || userInput == "y")
                 {
-                    DisplayMenu();
+                    Console.Write("List a door that it needs access to: ");
+                    string NeededDoor = Console.ReadLine();
+                    DoorList.Add(NeededDoor);
                 }
-
-                Badges Item = new Badges(badgeID, listOfDoorNamesForAccess);
-
-                //Add to repository
-                _badgesRepo.AddItemToDirectory(Item);
+                if (userInput == "N" || userInput == "n")
+                {
+                    KeepRuning = false;
+                }
             }
+
+            //Add to repository
+            _badgesRepo.AddItemToDirectory(badgeID, DoorList);
         }
 
-
-
-        //Display All Items
-        void ShowAllItems()
+        
+        private void ShowAllItems()
         {
             Console.Clear();
 
             //Get Content
-            Dictionary<BadgeID, ListOfDoorNamesForAccess> listOfItems = _badgesRepo.GetItems();
+            Dictionary<int, List<string>> listOfItems = _badgesRepo.GetItems();
 
             //Loop through Contents
             Console.WriteLine("{0,15} {1,15}", "Key Badge #", "Door Access");
-            foreach (Badges content in listOfItems)
             {
-                //Console Write (Display Content)
-                DisplayItemsTwo(content);
-            }
-
-            //if invald input
-            PressKeyToCountinue();
-        }
-
-        //Update
-        void UpdateBadge()
-        {
-            {
-                Console.Clear();
-                //Original Title
-                //Ask the user what to update
-                Console.WriteLine("What is the badge number to update?");
-                //Getting user input
-                int badgeID = int.Parse(Console.ReadLine());
-                //Get Content
-                List<string> Item = _badgesRepo.GetDoorNameByBadgeId(badgeID);
-
-                //If we have it
-                if (Item != null)
+                foreach (KeyValuePair<int, List<string>> content in listOfItems)
                 {
-                    //Display content
-                    DisplayDoors(Item);
-                }
-                else
-                {
-                    Console.WriteLine("Failed to find title");
-                }
-                Console.WriteLine(
-                    "What would you like to do? \n" +
-                    "1. Remove door \n" +
-                    "2. Add a door \n");
-
-                string userInput = Console.ReadLine();
-                if (userInput == "1")
-                {
-                    Console.WriteLine("Which door would you like to remove?");
-                    string DoorToRemove = Console.ReadLine();
-                    if (DoorToRemove != null)
-                    {
-                        _badgesRepo.RemoveDoor(badgeID, DoorToRemove);
-                        Console.WriteLine("Door removed.");
-                        DisplayDoors(Item);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Failed to find door");
-                    }
-                    PressKeyToCountinue();
-                }
-                if (userInput == "2")
-                {
-                    Console.WriteLine("Which door would you like to Add?");
-                    string DoorToAdd = Console.ReadLine();
-                    if (DoorToAdd != null)
-                    {
-                        _badgesRepo.AddDoor(badgeID, DoorToAdd);
-                        Console.WriteLine("Door added.");
-                        DisplayDoors(Item);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Failed to find door");
-                    }
-                    PressKeyToCountinue();
-                }
-                else
-                {
-                    Console.WriteLine("Failed to find title");
+                    //Console Write (Display Content)
+                    DisplayDoors(content.Key, content.Value);
                 }
                 PressKeyToCountinue();
-
-
-
-
-                Badges updatedItem = new Badges();
-
-                Console.Write("What is the new meal number?");
-                updatedItem.BadgeID = int.Parse(Console.ReadLine());
-
-                Console.Write("What is the new name?");
-                updatedItem.ListOfDoorNamesForAccess = Console.ReadLine();
-
-
-                _badgesRepo.UpdateExsitingItem(userInput, updatedItem);
-                //Does this update
-                //Did they gove me a title
-                //Feedback message iser
-                PressKeyToCountinue();
-
-
             }
         }
 
-        //Helper Methods
-
-        private void DisplayItems(Badges content)
+        private void UpdateBadge()
         {
-            Console.WriteLine($"Claim ID : {content.ClaimID }\n" +
-                    $"Claim Type : {content.ClaimType }\n" +
-                    $"Description: {content.Description }\n" +
-                    $"Amount : {content.ClaimAmount }\n" +
-                    $"Date Of Incident : {content.DateOfIncident }\n" +
-                    $"Date Of Claim : {content.DateOfClaim  }\n" +
-                    $"IsValid  : {content.IsValid  }\n");
+            Console.Clear();
+            //Original Title
+            //Ask the user what to update
+            Console.WriteLine("What is the badge number to update?");
+            //Getting user input
+            int badgeID = int.Parse(Console.ReadLine());
+            //Get Content
+            List<string> Item = _badgesRepo.GetDoorNameByBadgeId(badgeID);
+
+            //If we have it
+            if (Item != null)
+            {
+                //Display content
+                DisplayDoors(badgeID, Item);
+            }
+            else
+            {
+                Console.WriteLine("Failed to find title");
+            }
+            Console.WriteLine(
+                "What would you like to do? \n" +
+                "1. Remove door \n" +
+                "2. Add a door \n");
+
+            string userInput = Console.ReadLine();
+            if (userInput == "1")
+            {
+                Console.WriteLine("Which door would you like to remove?");
+                string DoorToRemove = Console.ReadLine();
+                if (DoorToRemove != null)
+                {
+                    _badgesRepo.RemoveDoor(badgeID, DoorToRemove);
+                    Console.WriteLine("Door removed.");
+                    DisplayDoors(badgeID, Item);
+                }
+                else
+                {
+                    Console.WriteLine("Failed to find door");
+                }
+                PressKeyToCountinue();
+            }
+            if (userInput == "2")
+            {
+                Console.WriteLine("Which door would you like to Add?");
+                string DoorToAdd = Console.ReadLine();
+                if (DoorToAdd != null)
+                {
+                    _badgesRepo.AddDoor(badgeID, DoorToAdd);
+                    Console.WriteLine("Door added.");
+                    DisplayDoors(badgeID, Item);
+                }
+                else
+                {
+                    Console.WriteLine("Failed to find door");
+                }
+                PressKeyToCountinue();
+            }
         }
 
         private void DisplayItemsTwo(Badges badges)
@@ -223,12 +181,14 @@ namespace _03_BadgesUI
             Console.WriteLine("{0,15} {1,15}", badges.BadgeID, badges.ListOfDoorNamesForAccess);
         }
 
-        private void DisplayDoors(List<string> Doors)
+        private void DisplayDoors(int badgeNumber, List<string> Doors)
         {
-            foreach (string door in Doors)
-            {
-                Console.WriteLine(door);
-            }
+            string doorsList = string.Join(" ", Doors);
+            //foreach (string door in Doors)
+            //{
+            //   Console.WriteLine(door);
+            // }
+            Console.WriteLine(badgeNumber + " has access to: " + doorsList);
         }
 
         private void PressKeyToCountinue()
@@ -243,15 +203,14 @@ namespace _03_BadgesUI
         //Seed Method
         private void SeedContentList()
         {
-            Badges Baconator = new Badges(1, "Car", "nice car", 854, new DateTime(2018, 03, 24), new DateTime(2018, 04, 26), false);
-            Badges McDouble = new Badges(2, "Home", "nice house", 854, new DateTime(2018, 03, 24), new DateTime(2018, 04, 26), false);
-            Badges Whooper = new Badges(3, "Theft", "Oh no", 854, new DateTime(2018, 03, 24), new DateTime(2018, 04, 26), false);
+            Badges Micheal = new Badges(12345, new List<string>() { "A7" });
+            Badges Jen = new Badges(22345, new List<string>() { "A1", "A4", "B1", "B2" });
+            Badges Thomas = new Badges(32345, new List<string>() { "A4", "A5" });
 
-            _claimsRepo.AddItemToDirectory(Baconator);
-            _claimsRepo.AddItemToDirectory(McDouble);
-            _claimsRepo.AddItemToDirectory(Whooper);
+
+            _badgesRepo.AddItemToDirectory(Micheal.BadgeID, Micheal.ListOfDoorNamesForAccess);
+            _badgesRepo.AddItemToDirectory(Jen.BadgeID, Jen.ListOfDoorNamesForAccess);
+            _badgesRepo.AddItemToDirectory(Thomas.BadgeID, Thomas.ListOfDoorNamesForAccess);
         }
     }
-}
-}
 }
